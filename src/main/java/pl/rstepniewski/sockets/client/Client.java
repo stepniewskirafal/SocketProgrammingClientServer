@@ -24,12 +24,12 @@ public class Client {
         client.processCommunication();
     }
 
-    public void startConnection(String ip, int port) throws IOException {
+    private void startConnection(String ip, int port) throws IOException {
         clientSocket = new Socket(ip, port);
         System.out.println("Successfully established connection with the server.");
     }
 
-    public void stopConnection() throws IOException {
+    private void stopConnection() throws IOException {
         in.close();
         out.close();
         clientSocket.close();

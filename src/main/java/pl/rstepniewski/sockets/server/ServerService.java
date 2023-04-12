@@ -18,12 +18,12 @@ public class ServerService {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     static ObjectNode jsonNode = objectMapper.createObjectNode();
 
-    public ServerService(Server server) throws IOException {
+    ServerService(Server server) throws IOException {
         this.server = server;
         start();
     }
 
-    public void run() throws IOException {
+    void run() throws IOException {
         mainLoop();
     }
 
