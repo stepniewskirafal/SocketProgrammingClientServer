@@ -1,15 +1,13 @@
 package pl.rstepniewski.sockets.server;
 
-import pl.rstepniewski.sockets.manager.CommandManager;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
-    private static final String SERVER_VERSION = "0.3.0";
-    private static final String CREATION_DATE = "10.08.2022";
-    private static final int PORT_NUMBER = 4444;
+    private static final String SERVER_VERSION = "0.2.2";
+    private static final String CREATION_DATE = "12.04.2023";
+    private static final int PORT_NUMBER = 6901;
     private ServerSocket serverSocket;
     private Socket clientSocket;
 
@@ -38,7 +36,7 @@ public class Server {
     }
 
     public static void main(String[] args) throws IOException {
-        CommandManager commandManager = new CommandManager(new Server());
-        commandManager.run();
+        ServerService serverService = new ServerService(new Server());
+        serverService.run();
     }
 }

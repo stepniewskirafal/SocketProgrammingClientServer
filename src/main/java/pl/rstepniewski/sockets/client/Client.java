@@ -19,7 +19,7 @@ public class Client {
 
     public static void main(String[] args) throws IOException {
         Client client = new Client();
-        client.startConnection("localhost", 4444);
+        client.startConnection("localhost", 6901);
 
         client.processCommunication();
     }
@@ -44,14 +44,10 @@ public class Client {
 
         while (true) {
             String messageFromServer = in.readLine();
-
             if (messageFromServer != null) {
-                boolean isResponseRequired = printMessageFromServer(messageFromServer);
-
-                if (isResponseRequired) {
-                    String command = scanner.nextLine();
-                    out.println(command);
-                }
+                printMessageFromServer(messageFromServer);
+                String command = scanner.nextLine();
+                out.println(command);
             } else {
                 stopConnection();
                 return;
@@ -59,11 +55,8 @@ public class Client {
         }
     }
 
-    private boolean printMessageFromServer(String messageFromServer) throws JsonProcessingException {
+    private void printMessageFromServer(String messageFromServer) throws JsonProcessingException {
         Map<String, String> mappedMessageFromServer = objectMapper.readValue(messageFromServer, Map.class);
-
-        boolean isResponseRequired = mappedMessageFromServer.get("responseRequired").equals("true");
-        mappedMessageFromServer.remove("responseRequired");
 
         String json;
         if (mappedMessageFromServer.size() > 1) {
@@ -73,8 +66,6 @@ public class Client {
         }
 
         System.out.println(json);
-
-        return isResponseRequired;
     }
 
 }
