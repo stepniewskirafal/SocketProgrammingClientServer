@@ -107,4 +107,6 @@ public class ServerService {
         jsonNode.put("Command", "Command unknown.");
         sendMessage(jsonNode);
     }
+
+
 }
