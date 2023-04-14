@@ -16,7 +16,7 @@ public class ServerService {
     private BufferedReader in;
     private final Instant startTime = Instant.now();
     private ObjectMapper objectMapper = new ObjectMapper();
-    ObjectNode jsonNode = objectMapper.createObjectNode();
+    private ObjectNode jsonNode = objectMapper.createObjectNode();
 
     ServerService(Server server) throws IOException {
         this.server = server;
