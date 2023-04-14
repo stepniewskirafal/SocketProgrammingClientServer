@@ -6,9 +6,11 @@ import pl.rstepniewski.sockets.domain.User;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FileReadingService {
 
@@ -22,10 +24,12 @@ public class FileReadingService {
                 .map(Path::toFile)
                 .collect(Collectors.toList());
 
-        List<User> allUsers = null;
+        List<User> allUsers = new ArrayList<>();
+        List<User> newUsers = null;
         for (File userFile : userFiles) {
             User[] users = objectMapper.readValue(userFile, User[].class);
-            allUsers = Arrays.stream(users).collect(Collectors.toList());
+            newUsers = Arrays.stream(users).collect(Collectors.toList());
+            allUsers.addAll(newUsers);
         }
         return allUsers;
     }

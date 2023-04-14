@@ -7,7 +7,6 @@ import pl.rstepniewski.sockets.file.FileReadingService;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.List;
 
 public class Server {
     private static final String SERVER_VERSION = "0.2.3";

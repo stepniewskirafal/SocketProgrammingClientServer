@@ -3,12 +3,19 @@ package pl.rstepniewski.sockets.server;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import pl.rstepniewski.sockets.domain.User;
+import pl.rstepniewski.sockets.domain.UserDto;
+import pl.rstepniewski.sockets.domain.UserService;
+import pl.rstepniewski.sockets.file.FileReadingService;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 public class ServerService {
     private final Server server;
@@ -40,6 +47,8 @@ public class ServerService {
     }
 
     private void mainLoop() throws IOException {
+        User user = loginProcess();
+        System.out.println(user.getUsername());
         showUserInterface();
         while (true) {
             switch (receiveAnswer().toLowerCase()) {
@@ -52,6 +61,39 @@ public class ServerService {
                 default       -> unknownCommand();
             }
         }
+    }
+
+    private User loginProcess() throws IOException {
+        User loggedUser;
+        FileReadingService fileReadingService = new FileReadingService();
+        UserService userService = new UserService(fileReadingService);
+        Stream<User> userStream = userService.getUserList().stream();
+        Optional<User> first;
+        while (true){
+            UserDto userDto = getUserNameAndPassword();
+            first = userStream
+                    .filter(user -> (user.getUsername().equals(userDto.getUsername())
+                            && (user.getPassword().equals(userDto.getPassword()))))
+                    .findFirst();
+            if(!first.isEmpty()){
+                break;
+            }
+            getUserNameAndPassword();
+        }
+        return first.get();
+    }
+
+    private UserDto getUserNameAndPassword() throws IOException {
+        jsonNode.put("Log in", "Provide your credentials:");
+        jsonNode.put("User name", "Provide your user name");
+        sendMessage(jsonNode);
+        String userName = receiveAnswer();
+
+        jsonNode.put("Password", "Provide your password");
+        sendMessage(jsonNode);
+        String password = receiveAnswer();
+
+        return new UserDto(userName, password);
     }
 
     private void showUserInterface() throws JsonProcessingException {
@@ -99,13 +141,13 @@ public class ServerService {
         sendMessage(jsonNode);
     }
 
-    private String receiveAnswer() throws IOException {
-        return in.readLine();
-    }
-
     private void unknownCommand() throws JsonProcessingException {
         jsonNode.put("Command", "Command unknown.");
         sendMessage(jsonNode);
+    }
+
+    private String receiveAnswer() throws IOException {
+        return in.readLine();
     }
 
 

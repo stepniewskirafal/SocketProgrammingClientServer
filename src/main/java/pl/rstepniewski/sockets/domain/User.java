@@ -6,28 +6,28 @@ public class User {
 
     private String username;
     private String password;
-    private String role;
+    private Role role;
 
-    public User(@JsonProperty("username") String username, @JsonProperty("password") String password, @JsonProperty("role") String role) {
+    public User(@JsonProperty("username") String username, @JsonProperty("password") String password, @JsonProperty("role") Role role) {
         this.username = username;
         this.password = password;
         this.role = role;
+    }
+
+    public User() {
     }
 
     public String getUsername() {
         return username;
     }
 
-    public User() {
+    public String getPassword() {
+        return password;
     }
-    /*    private Role role;
 
-    public User(String username, String password, Role role) {
-        this.username = username;
-        this.password = password;
-        this.role = role;
-    }*/
-
+    public Role getRole() {
+        return role;
+    }
 
     public enum Role {
         USER, ADMIN
