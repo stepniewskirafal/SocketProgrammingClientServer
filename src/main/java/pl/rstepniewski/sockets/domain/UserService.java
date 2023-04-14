@@ -27,6 +27,16 @@ public class UserService {
         return adminList;
     }
 
+    public List<User> getAllUserList() throws IOException {
+        userList = getUserList();
+        adminList = getAdminList();
+        List<User> allUserStream = new ArrayList<>();
+        allUserStream.addAll(userList);
+        allUserStream.addAll(adminList);
+
+        return adminList;
+    }
+
     public void addUser(User user){
         boolean contains = userList.contains(user);
         if(!contains){

@@ -14,6 +14,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -48,7 +50,35 @@ public class ServerService {
 
     private void mainLoop() throws IOException {
         User user = loginProcess();
-        System.out.println(user.getUsername());
+        switch (user.getRole()) {
+            case USER -> {
+                handleUserInterface();
+            }
+            case ADMIN -> {
+                handleAdminInterface();
+            }
+        }
+
+
+    }
+
+    private void handleAdminInterface() throws IOException {
+        showAdminInterface();
+        while (true) {
+            switch (receiveAnswer().toLowerCase()) {
+                case "uptime" -> showUptime();
+                case "info"   -> showInfo();
+                case "help"   -> showHelp();
+                case "stop"   -> {
+                    stop();
+                    return;
+                }
+                default       -> unknownCommand();
+            }
+        }
+    }
+
+    private void handleUserInterface() throws IOException {
         showUserInterface();
         while (true) {
             switch (receiveAnswer().toLowerCase()) {
@@ -57,30 +87,34 @@ public class ServerService {
                 case "help"   -> showHelp();
                 case "stop"   -> {
                     stop();
-                    return; }
+                    return;
+                }
                 default       -> unknownCommand();
             }
         }
     }
 
     private User loginProcess() throws IOException {
-        User loggedUser;
+        Optional<User> loginAttempt;
         FileReadingService fileReadingService = new FileReadingService();
         UserService userService = new UserService(fileReadingService);
-        Stream<User> userStream = userService.getUserList().stream();
-        Optional<User> first;
+
+        /*wywalić do jednej procki komitować jako poprawwa logowania i interface*/
+        List<User> allUserList = userService.getAllUserList();
+
         while (true){
             UserDto userDto = getUserNameAndPassword();
-            first = userStream
+            loginAttempt = allUserList
+                    .stream()
                     .filter(user -> (user.getUsername().equals(userDto.getUsername())
                             && (user.getPassword().equals(userDto.getPassword()))))
                     .findFirst();
-            if(!first.isEmpty()){
+            if(!loginAttempt.isEmpty()){
                 break;
             }
             getUserNameAndPassword();
         }
-        return first.get();
+        return loginAttempt.get();
     }
 
     private UserDto getUserNameAndPassword() throws IOException {
@@ -89,6 +123,7 @@ public class ServerService {
         sendMessage(jsonNode);
         String userName = receiveAnswer();
 
+        jsonNode.put("Log in", "Provide your credentials:");
         jsonNode.put("Password", "Provide your password");
         sendMessage(jsonNode);
         String password = receiveAnswer();
@@ -98,10 +133,29 @@ public class ServerService {
 
     private void showUserInterface() throws JsonProcessingException {
         jsonNode.put("SERVER MENU", "Options:");
+        jsonNode.put("sendMessage", "Send a message to another User.");
+        jsonNode.put("showMessageBox", "Present a list of your messages.");
+        jsonNode.put("readMessage", "Read a chosen message.");
+        jsonNode.put("deleteMessage", "Delete a chosen message.");
+
+        sendMessage(jsonNode);
+    }
+
+    private void showAdminInterface() throws JsonProcessingException {
+        jsonNode.put("SERVER MENU", "Options:");
         jsonNode.put("uptime", "Return server running time");
         jsonNode.put("info", "Return server version and creation date");
         jsonNode.put("help", "Return list of available commands");
         jsonNode.put("stop", "Stop server and client");
+
+        jsonNode.put("listAllUsers", "Show a list of all users and their roles");
+        jsonNode.put("addNewUser", "Add a new user to the app");
+        jsonNode.put("deleteUser","Delete user from the app");
+        jsonNode.put("changeRole", "Change the user role");
+        jsonNode.put("sendMessage", "Send a message to another User.");
+        jsonNode.put("showMessageBox", "Present a list of your messages.");
+        jsonNode.put("readMessage", "Read the chosen message.");
+        jsonNode.put("deleteMessage", "Delete the chosen message.");
 
         sendMessage(jsonNode);
     }
