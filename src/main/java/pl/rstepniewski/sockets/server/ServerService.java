@@ -14,10 +14,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public class ServerService {
     private final Server server;
@@ -73,6 +71,14 @@ public class ServerService {
                     stop();
                     return;
                 }
+                case "listAllUsers"   -> listAllUsers();
+                case "addNewUser"     -> addNewUser();
+                case "deleteUser"     -> deleteUser();
+                case "changeRole"     -> changeRole();
+                case "sendMessage"    -> sendMessage();
+                case "showMessageBox" -> showMessageBox();
+                case "readMessage"    -> readMessage();
+                case "deleteMessage"  -> deleteMessage();
                 default       -> unknownCommand();
             }
         }
@@ -82,13 +88,10 @@ public class ServerService {
         showUserInterface();
         while (true) {
             switch (receiveAnswer().toLowerCase()) {
-                case "uptime" -> showUptime();
-                case "info"   -> showInfo();
-                case "help"   -> showHelp();
-                case "stop"   -> {
-                    stop();
-                    return;
-                }
+                case "sendMessage"    -> sendMessage();
+                case "showMessageBox" -> showMessageBox();
+                case "readMessage"    -> readMessage();
+                case "deleteMessage"  -> deleteMessage();
                 default       -> unknownCommand();
             }
         }
@@ -120,12 +123,12 @@ public class ServerService {
     private UserDto getUserNameAndPassword() throws IOException {
         jsonNode.put("Log in", "Provide your credentials:");
         jsonNode.put("User name", "Provide your user name");
-        sendMessage(jsonNode);
+        sendJsonMessage(jsonNode);
         String userName = receiveAnswer();
 
         jsonNode.put("Log in", "Provide your credentials:");
         jsonNode.put("Password", "Provide your password");
-        sendMessage(jsonNode);
+        sendJsonMessage(jsonNode);
         String password = receiveAnswer();
 
         return new UserDto(userName, password);
@@ -138,7 +141,7 @@ public class ServerService {
         jsonNode.put("readMessage", "Read a chosen message.");
         jsonNode.put("deleteMessage", "Delete a chosen message.");
 
-        sendMessage(jsonNode);
+        sendJsonMessage(jsonNode);
     }
 
     private void showAdminInterface() throws JsonProcessingException {
@@ -157,10 +160,10 @@ public class ServerService {
         jsonNode.put("readMessage", "Read the chosen message.");
         jsonNode.put("deleteMessage", "Delete the chosen message.");
 
-        sendMessage(jsonNode);
+        sendJsonMessage(jsonNode);
     }
 
-    private void sendMessage(ObjectNode jsonNode) throws JsonProcessingException {
+    private void sendJsonMessage(ObjectNode jsonNode) throws JsonProcessingException {
         String json = objectMapper.writeValueAsString(jsonNode);
         jsonNode.removeAll();
         out.println(json);
@@ -177,14 +180,14 @@ public class ServerService {
         jsonNode.put("minutes", Long.toString(MM));
         jsonNode.put("seconds", Long.toString(SS));
 
-        sendMessage(jsonNode);
+        sendJsonMessage(jsonNode);
     }
 
     private void showInfo() throws JsonProcessingException {
         jsonNode.put("server version", server.getServerVersion());
         jsonNode.put("creation date", server.getCreationDate());
 
-        sendMessage(jsonNode);
+        sendJsonMessage(jsonNode);
     }
 
     private void showHelp() throws JsonProcessingException {
@@ -192,12 +195,12 @@ public class ServerService {
         jsonNode.put("info", "Return server version and creation date");
         jsonNode.put("help", "Return list of available commands");
 
-        sendMessage(jsonNode);
+        sendJsonMessage(jsonNode);
     }
 
     private void unknownCommand() throws JsonProcessingException {
         jsonNode.put("Command", "Command unknown.");
-        sendMessage(jsonNode);
+        sendJsonMessage(jsonNode);
     }
 
     private String receiveAnswer() throws IOException {
