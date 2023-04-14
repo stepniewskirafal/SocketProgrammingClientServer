@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class Client {
+
+    private final String LOCAL_HOST = "localhost";
+    private final int PORT_NUMBER = 6901;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private Socket clientSocket;
     private PrintWriter out;
@@ -19,7 +22,7 @@ public class Client {
 
     public static void main(String[] args) throws IOException {
         Client client = new Client();
-        client.startConnection("localhost", 6901);
+        client.startConnection(LOCAL_HOST, PORT_NUMBER);
 
         client.processCommunication();
     }
