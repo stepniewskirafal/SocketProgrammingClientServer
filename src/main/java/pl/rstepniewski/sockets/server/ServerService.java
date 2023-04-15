@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import pl.rstepniewski.sockets.domain.User;
 import pl.rstepniewski.sockets.domain.UserDto;
+import pl.rstepniewski.sockets.domain.UserRole;
 import pl.rstepniewski.sockets.domain.UserService;
 import pl.rstepniewski.sockets.file.FileReadingService;
 
@@ -24,6 +25,8 @@ public class ServerService {
     private final Instant startTime = Instant.now();
     private ObjectMapper objectMapper = new ObjectMapper();
     private ObjectNode jsonNode = objectMapper.createObjectNode();
+    FileReadingService fileReadingService = new FileReadingService();
+    UserService userService = new UserService(fileReadingService);
 
     ServerService(Server server) throws IOException {
         this.server = server;
@@ -56,14 +59,13 @@ public class ServerService {
                 handleAdminInterface();
             }
         }
-
-
     }
 
     private void handleAdminInterface() throws IOException {
         showAdminInterface();
         while (true) {
-            switch (receiveAnswer().toLowerCase()) {
+            String lowerCase = getClientAnswer();
+            switch (lowerCase) {
                 case "uptime" -> showUptime();
                 case "info"   -> showInfo();
                 case "help"   -> showHelp();
@@ -72,26 +74,59 @@ public class ServerService {
                     return;
                 }
                 case "listAllUsers"   -> listAllUsers();
-                case "addNewUser"     -> addNewUser();
-                case "deleteUser"     -> deleteUser();
+/*               case "addNewUser"     -> addNewUser();
+                 case "deleteUser"     -> deleteUser();
                 case "changeRole"     -> changeRole();
                 case "sendMessage"    -> sendMessage();
                 case "showMessageBox" -> showMessageBox();
                 case "readMessage"    -> readMessage();
-                case "deleteMessage"  -> deleteMessage();
+                case "deleteMessage"  -> deleteMessage();*/
                 default       -> unknownCommand();
             }
         }
     }
 
+    private void addNewUser() throws IOException {
+        jsonNode.put("User name", "Provide new user name");
+        sendJsonMessage(jsonNode);
+        String userName = getClientAnswer();
+
+        jsonNode.put("Password", "Provide new user password");
+        sendJsonMessage(jsonNode);
+        String password = getClientAnswer();
+
+        jsonNode.put("Password", "Provide new user role");
+        sendJsonMessage(jsonNode);
+        String role = getClientAnswer();
+
+        userService.addUser(new User(userName,password, UserRole.USER));     /*!!!!!!!!!!!!!!!!!!!!!!! TO DO zmienić na jakieś ładne wczytanie z funkcji*/
+    }
+
+    private void listAllUsers() throws IOException {
+        List<User> allUserList = userService.getAllUserList();
+        allUserList.stream()
+            .forEach( (element) -> {
+                int index = allUserList.indexOf(element);
+                jsonNode.put(String.valueOf(index), element.getUsername() + " " + element.getRole());
+            } );
+
+/*        List<User> allUserList2 = userService.getAllUserList();
+        allUserList2.stream()
+                .forEach((index, user) -> {
+                    jsonNode.put(String.valueOf(index), user.getUsername());
+                });*/
+
+        sendJsonMessage(jsonNode);
+    }
+
     private void handleUserInterface() throws IOException {
         showUserInterface();
         while (true) {
-            switch (receiveAnswer().toLowerCase()) {
-                case "sendMessage"    -> sendMessage();
+            switch (getClientAnswer().toLowerCase()) {
+/*                case "sendMessage"    -> sendMessage();
                 case "showMessageBox" -> showMessageBox();
                 case "readMessage"    -> readMessage();
-                case "deleteMessage"  -> deleteMessage();
+                case "deleteMessage"  -> deleteMessage();*/
                 default       -> unknownCommand();
             }
         }
@@ -99,12 +134,8 @@ public class ServerService {
 
     private User loginProcess() throws IOException {
         Optional<User> loginAttempt;
-        FileReadingService fileReadingService = new FileReadingService();
-        UserService userService = new UserService(fileReadingService);
-
-        /*wywalić do jednej procki komitować jako poprawwa logowania i interface*/
         List<User> allUserList = userService.getAllUserList();
-
+        showWelcomePage();
         while (true){
             UserDto userDto = getUserNameAndPassword();
             loginAttempt = allUserList
@@ -120,16 +151,19 @@ public class ServerService {
         return loginAttempt.get();
     }
 
-    private UserDto getUserNameAndPassword() throws IOException {
+    private void showWelcomePage() throws IOException {
+        jsonNode.put("WelcomePage", "Welcome to the Message App:");
         jsonNode.put("Log in", "Provide your credentials:");
+    }
+
+    private UserDto getUserNameAndPassword() throws IOException {
         jsonNode.put("User name", "Provide your user name");
         sendJsonMessage(jsonNode);
-        String userName = receiveAnswer();
+        String userName = getClientAnswer();
 
-        jsonNode.put("Log in", "Provide your credentials:");
         jsonNode.put("Password", "Provide your password");
         sendJsonMessage(jsonNode);
-        String password = receiveAnswer();
+        String password = getClientAnswer();
 
         return new UserDto(userName, password);
     }
@@ -203,7 +237,7 @@ public class ServerService {
         sendJsonMessage(jsonNode);
     }
 
-    private String receiveAnswer() throws IOException {
+    private String getClientAnswer() throws IOException {
         return in.readLine();
     }
 

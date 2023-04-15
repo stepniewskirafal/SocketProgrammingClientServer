@@ -30,17 +30,17 @@ public class UserService {
     public List<User> getAllUserList() throws IOException {
         userList = getUserList();
         adminList = getAdminList();
-        List<User> allUserStream = new ArrayList<>();
-        allUserStream.addAll(userList);
-        allUserStream.addAll(adminList);
+        List<User> allUserList = new ArrayList<>();
+        allUserList.addAll(userList);
+        allUserList.addAll(adminList);
 
-        return adminList;
+        return allUserList;
     }
 
-    public void addUser(User user){
-        boolean contains = userList.contains(user);
+    public void addUser(User user) throws IOException {
+        boolean contains = getAllUserList().contains(user);
         if(!contains){
-            userList.add(user);
+            userList.add(user);           //*  nie do listy tylko do pliku   *//
         }
     }
 

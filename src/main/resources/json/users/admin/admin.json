@@ -1,7 +1,7 @@
 [
    {
-      "username": "john_doe3",
-      "password": "my_password",
+      "username": "admin",
+      "password": "admin",
       "role": "ADMIN"
    },
    {
