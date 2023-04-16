@@ -1,4 +1,4 @@
-package pl.rstepniewski.sockets.domain;
+package pl.rstepniewski.sockets.domain.user;
 
 public enum UserRole {
     USER("USER"), ADMIN("ADMIN");

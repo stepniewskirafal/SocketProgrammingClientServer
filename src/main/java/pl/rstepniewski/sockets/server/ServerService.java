@@ -3,10 +3,10 @@ package pl.rstepniewski.sockets.server;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import pl.rstepniewski.sockets.domain.User;
-import pl.rstepniewski.sockets.domain.UserDto;
-import pl.rstepniewski.sockets.domain.UserRole;
-import pl.rstepniewski.sockets.domain.UserService;
+import pl.rstepniewski.sockets.domain.user.User;
+import pl.rstepniewski.sockets.domain.user.UserDto;
+import pl.rstepniewski.sockets.domain.user.UserRole;
+import pl.rstepniewski.sockets.domain.user.UserService;
 import pl.rstepniewski.sockets.file.FileService;
 
 import java.io.BufferedReader;
@@ -77,14 +77,17 @@ public class ServerService {
                 case "listAllUsers"   -> listAllUsers();
                case "addNewUser"     -> addNewUser();
                  case "deleteUser"     -> deleteUser();
-/*                case "changeRole"     -> changeRole();
-                case "sendMessage"    -> sendMessage();
+                case "changeRole"     -> changeRole();
+/*                case "sendMessage"    -> sendMessage();
                 case "showMessageBox" -> showMessageBox();
                 case "readMessage"    -> readMessage();
                 case "deleteMessage"  -> deleteMessage();*/
                 default       -> unknownCommand();
             }
         }
+    }
+
+    private void changeRole() {
     }
 
     private void deleteUser() throws IOException {

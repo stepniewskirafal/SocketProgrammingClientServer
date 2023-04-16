@@ -6,4 +6,8 @@
   "username" : "john_doe4",
   "password" : "my_password",
   "role" : "ADMIN"
+}, {
+  "username" : "newAdmin",
+  "password" : "test",
+  "role" : "ADMIN"
 } ]

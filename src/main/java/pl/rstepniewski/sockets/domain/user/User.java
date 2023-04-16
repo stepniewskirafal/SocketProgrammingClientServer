@@ -1,4 +1,4 @@
-package pl.rstepniewski.sockets.domain;
+package pl.rstepniewski.sockets.domain.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

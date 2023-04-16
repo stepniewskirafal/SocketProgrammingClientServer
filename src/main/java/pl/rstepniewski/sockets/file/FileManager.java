@@ -1,6 +1,6 @@
 package pl.rstepniewski.sockets.file;
 
-import pl.rstepniewski.sockets.domain.User;
+import pl.rstepniewski.sockets.domain.user.User;
 
 import java.io.IOException;
 import java.util.List;

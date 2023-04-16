@@ -3,7 +3,7 @@ package pl.rstepniewski.sockets.file;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import pl.rstepniewski.sockets.domain.User;
+import pl.rstepniewski.sockets.domain.user.User;
 
 import java.io.File;
 import java.io.IOException;

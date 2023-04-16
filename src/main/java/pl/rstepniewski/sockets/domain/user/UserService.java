@@ -1,4 +1,4 @@
-package pl.rstepniewski.sockets.domain;
+package pl.rstepniewski.sockets.domain.user;
 
 import pl.rstepniewski.sockets.file.FileName;
 import pl.rstepniewski.sockets.file.FilePath;
