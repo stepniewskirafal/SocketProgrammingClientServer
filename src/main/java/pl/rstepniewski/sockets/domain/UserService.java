@@ -18,12 +18,12 @@ public class UserService {
     }
 
     public List<User> getUserList() throws IOException {
-        userList = fileReadingService.getAllUsersFromFiles(FilePath.USER_FOLDER.getFolderPath());
+        userList = fileReadingService.importAllUsersFromFiles(FilePath.USER_FOLDER.getFolderPath());
         return userList;
     }
 
     public List<User> getAdminList() throws IOException {
-        adminList = fileReadingService.getAllUsersFromFiles(FilePath.ADMIN_FOLDER.getFolderPath());
+        adminList = fileReadingService.importAllUsersFromFiles(FilePath.ADMIN_FOLDER.getFolderPath());
         return adminList;
     }
 
