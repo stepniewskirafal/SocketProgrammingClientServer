@@ -76,8 +76,8 @@ public class ServerService {
                 }
                 case "listAllUsers"   -> listAllUsers();
                case "addNewUser"     -> addNewUser();
-/*                 case "deleteUser"     -> deleteUser();
-                case "changeRole"     -> changeRole();
+                 case "deleteUser"     -> deleteUser();
+/*                case "changeRole"     -> changeRole();
                 case "sendMessage"    -> sendMessage();
                 case "showMessageBox" -> showMessageBox();
                 case "readMessage"    -> readMessage();
@@ -85,6 +85,16 @@ public class ServerService {
                 default       -> unknownCommand();
             }
         }
+    }
+
+    private void deleteUser() throws IOException {
+        jsonNode.put("User name", "Provide new user name");
+        sendJsonMessage(jsonNode);
+        String userName = getClientAnswer();
+
+        userService.removeUser(userName);
+        jsonNode.put("addNewUser", "New user has been successfully removed");
+        sendJsonMessage(jsonNode);
     }
 
     private void addNewUser() throws IOException {
@@ -109,8 +119,8 @@ public class ServerService {
 
         User userToAdd = new User(userName, password, UserRole.valueOf(role));
 
-        userService.addUser(userToAdd);     /*!!!!!!!!!!!!!!!!!!!!!!! TO DO zmienić na jakieś ładne wczytanie z funkcji*/
-        jsonNode.put("addNewUser", "New user has been added successfully");
+        userService.addUser(userToAdd);
+        jsonNode.put("addNewUser", "New user has been successfully added");
         sendJsonMessage(jsonNode);
     }
 

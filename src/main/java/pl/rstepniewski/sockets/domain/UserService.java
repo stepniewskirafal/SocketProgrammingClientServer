@@ -7,6 +7,7 @@ import pl.rstepniewski.sockets.file.FileService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class UserService {
 
@@ -59,11 +60,22 @@ public class UserService {
         }
     }
 
-    public void removeUser(User user){
-        userList.remove(user);
+    public void removeUser(String userName) throws IOException {
+        List<User> userList = getUserList();
 
-    }
-    public void removeAdnin(User admin){
-        adminList.remove(admin);
+        Optional<String> optionaUser = userList.stream()
+                .map(User::getUsername)
+                .findAny();
+
+        if(!userList.contains(user)){
+            userList.add(user);
+            fileService.exportUserData(userList, FilePath.USER_FOLDER, FileName.USERFILENAME);
+        }
+        List<User> adminList = getAdminList();
+        if(!adminList.contains(user)){
+            adminList.add(user);
+            fileService.exportUserData(adminList, FilePath.USER_FOLDER, FileName.USERFILENAME);
+        }
+
     }
 }
