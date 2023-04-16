@@ -1,8 +1,8 @@
 package pl.rstepniewski.sockets.file;
 
 public enum FileName {
-    USERFILENAME("user.json"),
-    ADMINFILENAME("admin.json");
+    USER_FILENAME("user.json"),
+    ADMIN_FILENAME("admin.json");
 
     private final String fileName;
 

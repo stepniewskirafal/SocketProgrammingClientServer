@@ -48,7 +48,7 @@ public class UserService {
                 List<User> userList = getUserList();
                 if(!userList.contains(user)){
                     userList.add(user);
-                    fileService.exportUserData(userList, FilePath.USER_FOLDER, FileName.USERFILENAME);
+                    fileService.exportUserData(userList, FilePath.USER_FOLDER, FileName.USER_FILENAME);
                     result = true;
                 }
             }
@@ -56,7 +56,7 @@ public class UserService {
                 List<User> adminList = getAdminList();
                 if(!adminList.contains(user)){
                     adminList.add(user);
-                    fileService.exportUserData(adminList, FilePath.ADMIN_FOLDER, FileName.ADMINFILENAME);
+                    fileService.exportUserData(adminList, FilePath.ADMIN_FOLDER, FileName.ADMIN_FILENAME);
                     result = true;
                 }
             }
@@ -78,12 +78,12 @@ public class UserService {
                 case USER -> {
                     List<User> userList = getUserList();
                     result = userList.removeIf(x -> x.getUsername().equals(userName));
-                    fileService.exportUserData(userList, FilePath.USER_FOLDER, FileName.USERFILENAME);
+                    fileService.exportUserData(userList, FilePath.USER_FOLDER, FileName.USER_FILENAME);
                 }
                 case ADMIN -> {
                     List<User> adminList = getAdminList();
                     result = adminList.removeIf(x -> x.getUsername().equals(userName));
-                    fileService.exportUserData(adminList, FilePath.ADMIN_FOLDER, FileName.ADMINFILENAME);
+                    fileService.exportUserData(adminList, FilePath.ADMIN_FOLDER, FileName.ADMIN_FILENAME);
                 }
             }
         }
