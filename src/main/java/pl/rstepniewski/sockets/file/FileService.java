@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FileReadingService implements FileManager{
+public class FileService implements FileManager{
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -28,14 +28,17 @@ public class FileReadingService implements FileManager{
 
         List<User> allUsers = new ArrayList<>();
         List<User> newUsers = null;
-        for (File userFile : userFiles)
+        for (File userFile : userFiles) {
+            newUsers = Arrays.stream(objectMapper.readValue(userFile, User[].class)).toList();
+            allUsers.addAll(newUsers);
+        }
+
         return allUsers;
     }
 
     @Override
-    public void exportUserData(List<User> userList, String filePath, String jsonFilename) throws IOException {
-        File jsonFile = new File(filePath+ "/" + jsonFilename);
-
+    public void exportUserData(List<User> userList, FilePath filePath, FileName fileName) throws IOException {
+        File jsonFile = new File(filePath.getFolderPath()+ "/" + fileName.getFileName());
         ObjectWriter writer = objectMapper.writer(new DefaultPrettyPrinter());
 
         writer.writeValue(jsonFile, userList);

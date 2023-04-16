@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface FileManager {
     List<User> importAllUsersFromFiles(String filePath) throws IOException;
-    void exportUserData(List<User> userList, String filePath, String jsonFilename) throws IOException;
+    void exportUserData(List<User> userList, FilePath filePath, FileName fileName) throws IOException;
 
 }

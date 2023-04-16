@@ -7,7 +7,7 @@ import pl.rstepniewski.sockets.domain.User;
 import pl.rstepniewski.sockets.domain.UserDto;
 import pl.rstepniewski.sockets.domain.UserRole;
 import pl.rstepniewski.sockets.domain.UserService;
-import pl.rstepniewski.sockets.file.FileReadingService;
+import pl.rstepniewski.sockets.file.FileService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,8 +26,8 @@ public class ServerService {
     private final Instant startTime = Instant.now();
     private ObjectMapper objectMapper = new ObjectMapper();
     private ObjectNode jsonNode = objectMapper.createObjectNode();
-    FileReadingService fileReadingService = new FileReadingService();
-    UserService userService = new UserService(fileReadingService);
+    FileService fileService = new FileService();
+    UserService userService = new UserService(fileService);
 
     ServerService(Server server) throws IOException {
         this.server = server;
@@ -74,8 +75,8 @@ public class ServerService {
                     return;
                 }
                 case "listAllUsers"   -> listAllUsers();
-/*               case "addNewUser"     -> addNewUser();
-                 case "deleteUser"     -> deleteUser();
+               case "addNewUser"     -> addNewUser();
+/*                 case "deleteUser"     -> deleteUser();
                 case "changeRole"     -> changeRole();
                 case "sendMessage"    -> sendMessage();
                 case "showMessageBox" -> showMessageBox();
@@ -95,11 +96,22 @@ public class ServerService {
         sendJsonMessage(jsonNode);
         String password = getClientAnswer();
 
-        jsonNode.put("Password", "Provide new user role");
-        sendJsonMessage(jsonNode);
-        String role = getClientAnswer();
+        String role;
+        while(true) {
+            jsonNode.put("Password", "Provide new user role");
+            sendJsonMessage(jsonNode);
+            role = getClientAnswer().toUpperCase();
+            List<String> list = Arrays.stream(UserRole.values()).map(UserRole::getRoleName).toList();
+            if (list.contains(role)){
+                break;
+            }
+        }
 
-        userService.addUser(new User(userName,password, UserRole.USER));     /*!!!!!!!!!!!!!!!!!!!!!!! TO DO zmienić na jakieś ładne wczytanie z funkcji*/
+        User userToAdd = new User(userName, password, UserRole.valueOf(role));
+
+        userService.addUser(userToAdd);     /*!!!!!!!!!!!!!!!!!!!!!!! TO DO zmienić na jakieś ładne wczytanie z funkcji*/
+        jsonNode.put("addNewUser", "New user has been added successfully");
+        sendJsonMessage(jsonNode);
     }
 
     private void listAllUsers() throws IOException {

@@ -1,7 +1,8 @@
 package pl.rstepniewski.sockets.domain;
 
+import pl.rstepniewski.sockets.file.FileName;
 import pl.rstepniewski.sockets.file.FilePath;
-import pl.rstepniewski.sockets.file.FileReadingService;
+import pl.rstepniewski.sockets.file.FileService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,21 +10,21 @@ import java.util.List;
 
 public class UserService {
 
-    private final FileReadingService fileReadingService;
+    private final FileService fileService;
     private List<User> userList = new ArrayList<>();
     private List<User> adminList = new ArrayList<>();
 
-    public UserService(FileReadingService fileReadingService) {
-        this.fileReadingService = fileReadingService;
+    public UserService(FileService fileService) {
+        this.fileService = fileService;
     }
 
     public List<User> getUserList() throws IOException {
-        userList = fileReadingService.importAllUsersFromFiles(FilePath.USER_FOLDER.getFolderPath());
+        userList = fileService.importAllUsersFromFiles(FilePath.USER_FOLDER.getFolderPath());
         return userList;
     }
 
     public List<User> getAdminList() throws IOException {
-        adminList = fileReadingService.importAllUsersFromFiles(FilePath.ADMIN_FOLDER.getFolderPath());
+        adminList = fileService.importAllUsersFromFiles(FilePath.ADMIN_FOLDER.getFolderPath());
         return adminList;
     }
 
@@ -38,16 +39,23 @@ public class UserService {
     }
 
     public void addUser(User user) throws IOException {
-        boolean contains = getAllUserList().contains(user);
-        if(!contains){
-            userList.add(user);           //*  nie do listy tylko do pliku   *//
-        }
-    }
+        UserRole userRole = user.getRole();
 
-    public void addAdnin(User admin){
-        boolean contains = adminList.contains(admin);
-        if(!contains){
-            adminList.add(admin);
+        switch (userRole) {
+            case USER -> {
+                List<User> userList = getUserList();
+                if(!userList.contains(user)){
+                    userList.add(user);
+                   fileService.exportUserData(userList, FilePath.USER_FOLDER, FileName.USERFILENAME);
+                }
+            }
+            case ADMIN -> {
+                List<User> adminList = getAdminList();
+                if(!adminList.contains(user)){
+                    adminList.add(user);
+                    fileService.exportUserData(adminList, FilePath.USER_FOLDER, FileName.USERFILENAME);
+                }
+            }
         }
     }
 

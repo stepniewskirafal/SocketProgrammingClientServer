@@ -4,7 +4,7 @@ public enum FileName {
     USERFILENAME("users.json"),
     ADMINFILENAME("admins.json");
 
-    String fileName;
+    private final String fileName;
 
     FileName(String fileName) {
         this.fileName = fileName;

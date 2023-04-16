@@ -1,12 +1,29 @@
-[
-   {
-      "username": "user",
-      "password": "user",
-      "role": "USER"
-   },
-   {
-      "username": "john_doe2",
-      "password": "my_password",
-      "role": "USER"
-   }
-]
+[ {
+  "username" : "user",
+  "password" : "user",
+  "role" : "USER"
+}, {
+  "username" : "john_doe2",
+  "password" : "my_password",
+  "role" : "USER"
+}, {
+  "username" : "john_bon1",
+  "password" : "my_password",
+  "role" : "USER"
+}, {
+  "username" : "john_bon2",
+  "password" : "my_password",
+  "role" : "USER"
+}, {
+  "username" : "asd",
+  "password" : "asd",
+  "role" : "USER"
+}, {
+  "username" : "asd",
+  "password" : "asd",
+  "role" : "USER"
+}, {
+  "username" : "asdaasda",
+  "password" : "asas",
+  "role" : "USER"
+} ]
