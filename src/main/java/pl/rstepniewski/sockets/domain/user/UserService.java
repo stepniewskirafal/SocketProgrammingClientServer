@@ -56,7 +56,7 @@ public class UserService {
                 List<User> adminList = getAdminList();
                 if(!adminList.contains(user)){
                     adminList.add(user);
-                    fileService.exportUserData(adminList, FilePath.USER_FOLDER, FileName.USERFILENAME);
+                    fileService.exportUserData(adminList, FilePath.ADMIN_FOLDER, FileName.ADMINFILENAME);
                     result = true;
                 }
             }
