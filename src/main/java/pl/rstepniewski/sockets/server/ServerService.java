@@ -92,8 +92,12 @@ public class ServerService {
         sendJsonMessage(jsonNode);
         String userName = getClientAnswer();
 
-        userService.removeUser(userName);
-        jsonNode.put("addNewUser", "New user has been successfully removed");
+        boolean responce = userService.removeUser(userName);
+        if (responce) {
+            jsonNode.put("addNewUser", "New user has been successfully removed");
+        }else {
+            jsonNode.put("addNewUser", "The process of removing a new user has failed.");
+        }
         sendJsonMessage(jsonNode);
     }
 
@@ -119,8 +123,12 @@ public class ServerService {
 
         User userToAdd = new User(userName, password, UserRole.valueOf(role));
 
-        userService.addUser(userToAdd);
-        jsonNode.put("addNewUser", "New user has been successfully added");
+        boolean responce = userService.addUser(userToAdd);
+        if (responce) {
+            jsonNode.put("addNewUser", "New user has been successfully added");
+        }else {
+            jsonNode.put("addNewUser", "The process of adding a new user has failed.");
+        }
         sendJsonMessage(jsonNode);
     }
 

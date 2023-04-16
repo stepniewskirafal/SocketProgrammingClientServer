@@ -1,16 +1,8 @@
 package pl.rstepniewski.sockets.server;
 
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import pl.rstepniewski.sockets.domain.User;
-import pl.rstepniewski.sockets.domain.UserRole;
-
-import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.List;
 
 public class Server {
     private static final String SERVER_VERSION = "0.2.3";

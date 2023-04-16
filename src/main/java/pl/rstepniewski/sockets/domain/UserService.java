@@ -39,15 +39,17 @@ public class UserService {
         return allUserList;
     }
 
-    public void addUser(User user) throws IOException {
+    public boolean addUser(User user) throws IOException {
         UserRole userRole = user.getRole();
+        boolean result = false;
 
         switch (userRole) {
             case USER -> {
                 List<User> userList = getUserList();
                 if(!userList.contains(user)){
                     userList.add(user);
-                   fileService.exportUserData(userList, FilePath.USER_FOLDER, FileName.USERFILENAME);
+                    fileService.exportUserData(userList, FilePath.USER_FOLDER, FileName.USERFILENAME);
+                    result = true;
                 }
             }
             case ADMIN -> {
@@ -55,27 +57,36 @@ public class UserService {
                 if(!adminList.contains(user)){
                     adminList.add(user);
                     fileService.exportUserData(adminList, FilePath.USER_FOLDER, FileName.USERFILENAME);
+                    result = true;
                 }
             }
         }
+        return result;
     }
 
-    public void removeUser(String userName) throws IOException {
-        List<User> userList = getUserList();
+    public boolean removeUser(String userName) throws IOException {
+        List<User> allUserList = getAllUserList();
+        boolean result = false;
 
-        Optional<String> optionaUser = userList.stream()
-                .map(User::getUsername)
-                .findAny();
+        Optional<User> optionaUser = allUserList.stream()
+                .filter(x -> x.getUsername().equals(userName))
+                .findFirst();
 
-        if(!userList.contains(user)){
-            userList.add(user);
-            fileService.exportUserData(userList, FilePath.USER_FOLDER, FileName.USERFILENAME);
+        if(!optionaUser.isEmpty()){
+            User userToRemove = optionaUser.get();
+            switch (userToRemove.getRole()) {
+                case USER -> {
+                    List<User> userList = getUserList();
+                    result = userList.removeIf(x -> x.getUsername().equals(userName));
+                    fileService.exportUserData(userList, FilePath.USER_FOLDER, FileName.USERFILENAME);
+                }
+                case ADMIN -> {
+                    List<User> adminList = getAdminList();
+                    result = adminList.removeIf(x -> x.getUsername().equals(userName));
+                    fileService.exportUserData(adminList, FilePath.ADMIN_FOLDER, FileName.ADMINFILENAME);
+                }
+            }
         }
-        List<User> adminList = getAdminList();
-        if(!adminList.contains(user)){
-            adminList.add(user);
-            fileService.exportUserData(adminList, FilePath.USER_FOLDER, FileName.USERFILENAME);
-        }
-
+        return result;
     }
 }
