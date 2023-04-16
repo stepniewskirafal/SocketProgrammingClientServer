@@ -77,7 +77,6 @@ public class ServerService {
                 case "listAllUsers"   -> listAllUsers();
                case "addNewUser"     -> addNewUser();
                  case "deleteUser"     -> deleteUser();
-                case "changeRole"     -> changeRole();
 /*                case "sendMessage"    -> sendMessage();
                 case "showMessageBox" -> showMessageBox();
                 case "readMessage"    -> readMessage();
@@ -85,9 +84,6 @@ public class ServerService {
                 default       -> unknownCommand();
             }
         }
-    }
-
-    private void changeRole() {
     }
 
     private void deleteUser() throws IOException {
