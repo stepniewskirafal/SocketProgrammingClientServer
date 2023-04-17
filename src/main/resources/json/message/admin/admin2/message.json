@@ -1,0 +1,11 @@
+[ {
+  "topic" : "test",
+  "content" : "test",
+  "recipient" : "admin2",
+  "sender" : "admin1"
+}, {
+  "topic" : "test2",
+  "content" : "test2",
+  "recipient" : "admin2",
+  "sender" : "admin1"
+} ]

@@ -3,6 +3,9 @@ package pl.rstepniewski.sockets.server;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import pl.rstepniewski.sockets.domain.message.Message;
+import pl.rstepniewski.sockets.domain.message.MessageConst;
+import pl.rstepniewski.sockets.domain.message.MessageService;
 import pl.rstepniewski.sockets.domain.user.User;
 import pl.rstepniewski.sockets.domain.user.UserDto;
 import pl.rstepniewski.sockets.domain.user.UserRole;
@@ -15,6 +18,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +32,7 @@ public class ServerService {
     private ObjectNode jsonNode = objectMapper.createObjectNode();
     FileService fileService = new FileService();
     UserService userService = new UserService(fileService);
+    MessageService messageService = new MessageService();
 
     ServerService(Server server) throws IOException {
         this.server = server;
@@ -51,18 +56,20 @@ public class ServerService {
     }
 
     private void mainLoop() throws IOException {
+
+        /*handleAdminInterface(new User("admin1", "admin1", UserRole.ADMIN)); --testing purposes*/
         User user = loginProcess();
         switch (user.getRole()) {
             case USER -> {
-                handleUserInterface();
+                handleUserInterface(user);
             }
             case ADMIN -> {
-                handleAdminInterface();
+                handleAdminInterface(user);
             }
         }
     }
 
-    private void handleAdminInterface() throws IOException {
+    private void handleAdminInterface(User user) throws IOException {
         showAdminInterface();
         while (true) {
             String lowerCase = getClientAnswer();
@@ -75,28 +82,92 @@ public class ServerService {
                     return;
                 }
                 case "listAllUsers"   -> listAllUsers();
-               case "addNewUser"     -> addNewUser();
-                 case "deleteUser"     -> deleteUser();
-/*                case "sendMessage"    -> sendMessage();
-                case "showMessageBox" -> showMessageBox();
-                case "readMessage"    -> readMessage();
-                case "deleteMessage"  -> deleteMessage();*/
+                case "addNewUser"     -> addNewUser();
+                case "deleteUser"     -> deleteUser();
+                case "sendMessage"    -> sendMessage(user);
+                case "readMessage"    -> readMessage(user);
                 default       -> unknownCommand();
             }
         }
     }
 
-    private void deleteUser() throws IOException {
-        jsonNode.put("User name", "Provide new user name");
-        sendJsonMessage(jsonNode);
-        String userName = getClientAnswer();
-
-        boolean responce = userService.removeUser(userName);
-        if (responce) {
-            jsonNode.put("addNewUser", "New user has been successfully removed");
-        }else {
-            jsonNode.put("addNewUser", "The process of removing a new user has failed.");
+    private void handleUserInterface(User user) throws IOException {
+        showUserInterface();
+        while (true) {
+            switch (getClientAnswer().toLowerCase()) {
+                case "sendMessage"    -> sendMessage(user);
+                case "readMessage"    -> readMessage(user);
+                default       -> unknownCommand();
+            }
         }
+    }
+
+    private void sendMessage(User user) throws IOException {
+        Message message = createMessage(user);
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(message);
+        Optional<User> userByNameOptional = userService.getUserByName(message.getRecipient());
+        if (userByNameOptional.isEmpty()){
+            jsonNode.put("sendMessageWarning", "There is no such user in the system yet.");
+            sendJsonMessage(jsonNode);
+            return;
+        }
+        User userByName = userByNameOptional.get();
+        messageService.sendMessage(userByName.getRole(), userByName.getUsername(), messageList);
+
+        jsonNode.put("sendMessage", "The process of sending message successfully finished.");
+        sendJsonMessage(jsonNode);
+    }
+    private Message createMessage(User user) throws IOException {
+        jsonNode.put("Sending a message", "Provide a recipient name and message content");
+        jsonNode.put("Recipient", "Who is your text recipient?");
+        sendJsonMessage(jsonNode);
+        String recipient = getClientAnswer().toLowerCase();
+
+        jsonNode.put("Topic", "Provide a topic of your message:");
+        sendJsonMessage(jsonNode);
+        String topic = getClientAnswer();
+
+        jsonNode.put("Message", "Provide a content of your message (will be trimmed to 255 characters):");
+        sendJsonMessage(jsonNode);
+        String content = getClientAnswer();
+        content = content.substring(0, Math.min(content.length(), MessageConst.MAX_LENGTH_OF_MESSAGE.getMessageLenght()));
+
+        return new Message(topic, content, recipient, user.getUsername());
+    }
+
+    private void readMessage(User user) throws IOException {
+        Optional<List<Message>> messageListOptional = messageService.getUserMessages(user);
+        if(messageListOptional.isEmpty()){
+            jsonNode.put("emailBoxWarning", "There is no message to read.");
+            sendJsonMessage(jsonNode);
+            return;
+        }
+
+        jsonNode.put("emailBoxWarning", "Please, read your messages carefully as the below list will self-destruct after you pick the next option or close a connection.");
+        List<Message> messageList = messageListOptional.get();
+        for(int i=0; i<messageList.size(); i++) {
+            jsonNode.put("readMessage" + (i + 1), "Message from "+ messageList.get(i).getSender());
+            jsonNode.put(messageList.get(i).getSender(), messageList.get(i).getContent());
+        }
+
+        sendJsonMessage(jsonNode);
+    }
+
+    private void listAllUsers() throws IOException {
+        List<User> allUserList = userService.getAllUserList();
+        allUserList.stream()
+                .forEach( (element) -> {
+                    int index = allUserList.indexOf(element);
+                    jsonNode.put(String.valueOf(index), element.getUsername() + " " + element.getRole());
+                } );
+
+/*        List<User> allUserList2 = userService.getAllUserList();
+        allUserList2.stream()
+                .forEach((index, user) -> {
+                    jsonNode.put(String.valueOf(index), user.getUsername());
+                });*/
+
         sendJsonMessage(jsonNode);
     }
 
@@ -131,34 +202,18 @@ public class ServerService {
         sendJsonMessage(jsonNode);
     }
 
-    private void listAllUsers() throws IOException {
-        List<User> allUserList = userService.getAllUserList();
-        allUserList.stream()
-            .forEach( (element) -> {
-                int index = allUserList.indexOf(element);
-                jsonNode.put(String.valueOf(index), element.getUsername() + " " + element.getRole());
-            } );
-
-/*        List<User> allUserList2 = userService.getAllUserList();
-        allUserList2.stream()
-                .forEach((index, user) -> {
-                    jsonNode.put(String.valueOf(index), user.getUsername());
-                });*/
-
+    private void deleteUser() throws IOException {
+        jsonNode.put("User name", "Provide new user name");
         sendJsonMessage(jsonNode);
-    }
+        String userName = getClientAnswer();
 
-    private void handleUserInterface() throws IOException {
-        showUserInterface();
-        while (true) {
-            switch (getClientAnswer().toLowerCase()) {
-/*                case "sendMessage"    -> sendMessage();
-                case "showMessageBox" -> showMessageBox();
-                case "readMessage"    -> readMessage();
-                case "deleteMessage"  -> deleteMessage();*/
-                default       -> unknownCommand();
-            }
+        boolean responce = userService.removeUser(userName);
+        if (responce) {
+            jsonNode.put("addNewUser", "New user has been successfully removed");
+        }else {
+            jsonNode.put("addNewUser", "The process of removing a new user has failed.");
         }
+        sendJsonMessage(jsonNode);
     }
 
     private User loginProcess() throws IOException {
@@ -200,9 +255,7 @@ public class ServerService {
     private void showUserInterface() throws JsonProcessingException {
         jsonNode.put("SERVER MENU", "Options:");
         jsonNode.put("sendMessage", "Send a message to another User.");
-        jsonNode.put("showMessageBox", "Present a list of your messages.");
         jsonNode.put("readMessage", "Read a chosen message.");
-        jsonNode.put("deleteMessage", "Delete a chosen message.");
 
         sendJsonMessage(jsonNode);
     }
@@ -217,11 +270,8 @@ public class ServerService {
         jsonNode.put("listAllUsers", "Show a list of all users and their roles");
         jsonNode.put("addNewUser", "Add a new user to the app");
         jsonNode.put("deleteUser","Delete user from the app");
-        jsonNode.put("changeRole", "Change the user role");
         jsonNode.put("sendMessage", "Send a message to another User.");
-        jsonNode.put("showMessageBox", "Present a list of your messages.");
         jsonNode.put("readMessage", "Read the chosen message.");
-        jsonNode.put("deleteMessage", "Delete the chosen message.");
 
         sendJsonMessage(jsonNode);
     }

@@ -14,7 +14,7 @@ import java.util.Scanner;
 public class Client {
 
     private static final String LOCAL_HOST = "localhost";
-    private static final int PORT_NUMBER = 6901;
+    private static final int PORT_NUMBER = 6900;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private Socket clientSocket;
     private PrintWriter out;

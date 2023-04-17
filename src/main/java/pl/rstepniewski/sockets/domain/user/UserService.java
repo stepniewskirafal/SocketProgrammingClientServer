@@ -19,13 +19,21 @@ public class UserService {
         this.fileService = fileService;
     }
 
+    public Optional<User> getUserByName(String userName) throws IOException {
+        userList = getAllUserList();
+        Optional<User> userOptional = userList.stream()
+                .filter(x -> x.getUsername().equals(userName))
+                .findFirst();
+        return userOptional;
+    }
+
     public List<User> getUserList() throws IOException {
-        userList = fileService.importAllUsersFromFiles(FilePath.USER_FOLDER.getFolderPath());
+        userList = fileService.importUsersFromJsonFiles(FilePath.USER_FOLDER.getFolderPath());
         return userList;
     }
 
     public List<User> getAdminList() throws IOException {
-        adminList = fileService.importAllUsersFromFiles(FilePath.ADMIN_FOLDER.getFolderPath());
+        adminList = fileService.importUsersFromJsonFiles(FilePath.ADMIN_FOLDER.getFolderPath());
         return adminList;
     }
 
@@ -48,7 +56,7 @@ public class UserService {
                 List<User> userList = getUserList();
                 if(!userList.contains(user)){
                     userList.add(user);
-                    fileService.exportUserData(userList, FilePath.USER_FOLDER, FileName.USER_FILENAME);
+                    fileService.exportUsersToJsonFiles(userList, FilePath.USER_FOLDER, FileName.USER_FILENAME);
                     result = true;
                 }
             }
@@ -56,7 +64,7 @@ public class UserService {
                 List<User> adminList = getAdminList();
                 if(!adminList.contains(user)){
                     adminList.add(user);
-                    fileService.exportUserData(adminList, FilePath.ADMIN_FOLDER, FileName.ADMIN_FILENAME);
+                    fileService.exportUsersToJsonFiles(adminList, FilePath.ADMIN_FOLDER, FileName.ADMIN_FILENAME);
                     result = true;
                 }
             }
@@ -78,12 +86,12 @@ public class UserService {
                 case USER -> {
                     List<User> userList = getUserList();
                     result = userList.removeIf(x -> x.getUsername().equals(userName));
-                    fileService.exportUserData(userList, FilePath.USER_FOLDER, FileName.USER_FILENAME);
+                    fileService.exportUsersToJsonFiles(userList, FilePath.USER_FOLDER, FileName.USER_FILENAME);
                 }
                 case ADMIN -> {
                     List<User> adminList = getAdminList();
                     result = adminList.removeIf(x -> x.getUsername().equals(userName));
-                    fileService.exportUserData(adminList, FilePath.ADMIN_FOLDER, FileName.ADMIN_FILENAME);
+                    fileService.exportUsersToJsonFiles(adminList, FilePath.ADMIN_FOLDER, FileName.ADMIN_FILENAME);
                 }
             }
         }
