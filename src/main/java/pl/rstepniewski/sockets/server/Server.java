@@ -5,8 +5,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
-    private static final String SERVER_VERSION = "0.2.3";
-    private static final String CREATION_DATE = "12.04.2023";
+    private static final String SERVER_VERSION = "0.3.0";
+    private static final String CREATION_DATE = "18.04.2023";
     private static final int PORT_NUMBER = 6900;
     private ServerSocket serverSocket;
     private Socket clientSocket;
