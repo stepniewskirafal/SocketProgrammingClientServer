@@ -9,8 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class UserService {
-
+public class UserService implements UserManager{
     private final FileService fileService;
     private List<User> userList = new ArrayList<>();
     private List<User> adminList = new ArrayList<>();
@@ -20,7 +19,7 @@ public class UserService {
     }
 
     public Optional<User> getUserByName(String userName) throws IOException {
-        userList = getAllUserList();
+        userList = getUserAndAdminList();
         Optional<User> userOptional = userList.stream()
                 .filter(x -> x.getUsername().equals(userName))
                 .findFirst();
@@ -28,16 +27,16 @@ public class UserService {
     }
 
     public List<User> getUserList() throws IOException {
-        userList = fileService.importUsersFromJsonFiles(FilePath.USER_FOLDER.getFolderPath());
+        userList = fileService.importDataFromJsonFiles(FilePath.USER_FOLDER.getFolderPath(), User[].class);
         return userList;
     }
 
     public List<User> getAdminList() throws IOException {
-        adminList = fileService.importUsersFromJsonFiles(FilePath.ADMIN_FOLDER.getFolderPath());
+        adminList = fileService.importDataFromJsonFiles(FilePath.ADMIN_FOLDER.getFolderPath(), User[].class);
         return adminList;
     }
 
-    public List<User> getAllUserList() throws IOException {
+    public List<User> getUserAndAdminList() throws IOException {
         userList = getUserList();
         adminList = getAdminList();
         List<User> allUserList = new ArrayList<>();
@@ -47,7 +46,7 @@ public class UserService {
         return allUserList;
     }
 
-    public boolean addUser(User user) throws IOException {
+    public boolean addNewUser(User user) throws IOException {
         UserRole userRole = user.getRole();
         boolean result = false;
 
@@ -56,7 +55,7 @@ public class UserService {
                 List<User> userList = getUserList();
                 if(!userList.contains(user)){
                     userList.add(user);
-                    fileService.exportUsersToJsonFiles(userList, FilePath.USER_FOLDER, FileName.USER_FILENAME);
+                    fileService.exportDataToJsonFiles(userList, FilePath.USER_FOLDER, FileName.USER_FILENAME);
                     result = true;
                 }
             }
@@ -64,7 +63,7 @@ public class UserService {
                 List<User> adminList = getAdminList();
                 if(!adminList.contains(user)){
                     adminList.add(user);
-                    fileService.exportUsersToJsonFiles(adminList, FilePath.ADMIN_FOLDER, FileName.ADMIN_FILENAME);
+                    fileService.exportDataToJsonFiles(adminList, FilePath.ADMIN_FOLDER, FileName.ADMIN_FILENAME);
                     result = true;
                 }
             }
@@ -73,7 +72,7 @@ public class UserService {
     }
 
     public boolean removeUser(String userName) throws IOException {
-        List<User> allUserList = getAllUserList();
+        List<User> allUserList = getUserAndAdminList();
         boolean result = false;
 
         Optional<User> optionaUser = allUserList.stream()
@@ -86,12 +85,12 @@ public class UserService {
                 case USER -> {
                     List<User> userList = getUserList();
                     result = userList.removeIf(x -> x.getUsername().equals(userName));
-                    fileService.exportUsersToJsonFiles(userList, FilePath.USER_FOLDER, FileName.USER_FILENAME);
+                    fileService.exportDataToJsonFiles(userList, FilePath.USER_FOLDER, FileName.USER_FILENAME);
                 }
                 case ADMIN -> {
                     List<User> adminList = getAdminList();
                     result = adminList.removeIf(x -> x.getUsername().equals(userName));
-                    fileService.exportUsersToJsonFiles(adminList, FilePath.ADMIN_FOLDER, FileName.ADMIN_FILENAME);
+                    fileService.exportDataToJsonFiles(adminList, FilePath.ADMIN_FOLDER, FileName.ADMIN_FILENAME);
                 }
             }
         }

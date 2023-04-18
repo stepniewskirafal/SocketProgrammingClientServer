@@ -1,6 +1,5 @@
 package pl.rstepniewski.sockets.domain.message;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import pl.rstepniewski.sockets.domain.user.User;
 import pl.rstepniewski.sockets.domain.user.UserRole;
 import pl.rstepniewski.sockets.file.FileName;
@@ -13,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class MessageService {
-    ObjectMapper objectMapper = new ObjectMapper();
 
     FileService fileService = new FileService();
 
@@ -24,8 +22,9 @@ public class MessageService {
                 String filePath = FilePath.USER_MESSAGE_FOLDER.getFolderPath() + "/" + user.getUsername() + "/" + FileName.MESSAGE_FILENAME.getFileName();
                 File file = new File(filePath);
                 if(file.exists()){
-                    messageList = Optional.of(fileService.importMessagesFromJsonFiles(
-                            FilePath.USER_MESSAGE_FOLDER.getFolderPath() + "/" + user.getUsername() + "/" + FileName.MESSAGE_FILENAME.getFileName()));
+                    messageList = Optional.of(fileService.importDataFromJsonFiles(
+                            FilePath.USER_MESSAGE_FOLDER.getFolderPath() + "/" + user.getUsername() + "/" + FileName.MESSAGE_FILENAME.getFileName(), Message[].class)
+                    );
                     fileService.deleteJsonMessagesFiles(FilePath.USER_MESSAGE_FOLDER, user.getUsername());
                 }
             }
@@ -33,8 +32,9 @@ public class MessageService {
                 String filePath = FilePath.ADMIN_MESSAGE_FOLDER.getFolderPath() + "/" + user.getUsername() + "/" + FileName.MESSAGE_FILENAME.getFileName();
                 File file = new File(filePath);
                 if(file.exists()) {
-                    messageList =  Optional.of(fileService.importMessagesFromJsonFiles(
-                            FilePath.ADMIN_MESSAGE_FOLDER.getFolderPath() + "/" + user.getUsername() + "/" + FileName.MESSAGE_FILENAME.getFileName()));
+                    messageList =  Optional.of(fileService.importDataFromJsonFiles(
+                            FilePath.ADMIN_MESSAGE_FOLDER.getFolderPath() + "/" + user.getUsername() + "/" + FileName.MESSAGE_FILENAME.getFileName(), Message[].class)
+                    );
                     fileService.deleteJsonMessagesFiles(FilePath.ADMIN_MESSAGE_FOLDER, user.getUsername());
                 }
             }
@@ -45,10 +45,10 @@ public class MessageService {
     public void sendMessage(UserRole role, String recipient, List<Message> messageList ) throws IOException {
         switch (role) {
             case USER -> {
-                fileService.exportMessagesFromJsonFiles(messageList, FilePath.USER_MESSAGE_FOLDER, recipient  ,FileName.MESSAGE_FILENAME);
+                fileService.exportDataToJsonFiles(messageList, FilePath.USER_MESSAGE_FOLDER, recipient  ,FileName.MESSAGE_FILENAME);
             }
             case ADMIN -> {
-                fileService.exportMessagesFromJsonFiles(messageList, FilePath.ADMIN_MESSAGE_FOLDER, recipient ,FileName.MESSAGE_FILENAME);
+                fileService.exportDataToJsonFiles(messageList, FilePath.ADMIN_MESSAGE_FOLDER, recipient ,FileName.MESSAGE_FILENAME);
             }
         }
     }

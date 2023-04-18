@@ -72,8 +72,7 @@ public class ServerService {
     private void handleAdminInterface(User user) throws IOException {
         showAdminInterface();
         while (true) {
-            String lowerCase = getClientAnswer();
-            switch (lowerCase) {
+            switch (getClientAnswer()) {
                 case "uptime" -> showUptime();
                 case "info"   -> showInfo();
                 case "help"   -> showHelp();
@@ -94,7 +93,7 @@ public class ServerService {
     private void handleUserInterface(User user) throws IOException {
         showUserInterface();
         while (true) {
-            switch (getClientAnswer().toLowerCase()) {
+            switch (getClientAnswer()) {
                 case "sendMessage"    -> sendMessage(user);
                 case "readMessage"    -> readMessage(user);
                 default       -> unknownCommand();
@@ -155,7 +154,7 @@ public class ServerService {
     }
 
     private void listAllUsers() throws IOException {
-        List<User> allUserList = userService.getAllUserList();
+        List<User> allUserList = userService.getUserAndAdminList();
         allUserList.stream()
                 .forEach( (element) -> {
                     int index = allUserList.indexOf(element);
@@ -193,7 +192,7 @@ public class ServerService {
 
         User userToAdd = new User(userName, password, UserRole.valueOf(role));
 
-        boolean responce = userService.addUser(userToAdd);
+        boolean responce = userService.addNewUser(userToAdd);
         if (responce) {
             jsonNode.put("addNewUser", "New user has been successfully added");
         }else {
@@ -218,7 +217,7 @@ public class ServerService {
 
     private User loginProcess() throws IOException {
         Optional<User> loginAttempt;
-        List<User> allUserList = userService.getAllUserList();
+        List<User> allUserList = userService.getUserAndAdminList();
         showWelcomePage();
         while (true){
             UserDto userDto = getUserNameAndPassword();
