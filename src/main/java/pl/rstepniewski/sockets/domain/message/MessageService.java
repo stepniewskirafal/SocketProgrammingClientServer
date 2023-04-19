@@ -79,9 +79,9 @@ public class MessageService {
                 userMessageBox = Optional.of(fileService.importDataFromJsonFiles( filePath, Message[].class) );
                 allMessagesToSave = userMessageBox.get();
                 allMessagesToSave.addAll(messageList);
-                fileService.exportDataToJsonFiles(allMessagesToSave, FilePath.USER_MESSAGE_FOLDER, recipient  ,FileName.MESSAGE_FILENAME);
+                fileService.exportDataToJsonFiles(allMessagesToSave, FilePath.ADMIN_MESSAGE_FOLDER, recipient  ,FileName.MESSAGE_FILENAME);
             }else {
-                fileService.exportDataToJsonFiles(messageList, FilePath.USER_MESSAGE_FOLDER, recipient  ,FileName.MESSAGE_FILENAME);
+                fileService.exportDataToJsonFiles(messageList, FilePath.ADMIN_MESSAGE_FOLDER, recipient  ,FileName.MESSAGE_FILENAME);
             }
         }
 
