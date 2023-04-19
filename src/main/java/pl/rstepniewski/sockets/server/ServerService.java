@@ -96,6 +96,10 @@ public class ServerService {
             switch (getClientAnswer()) {
                 case "sendMessage"    -> sendMessage(user);
                 case "readMessage"    -> readMessage(user);
+                case "stop"   -> {
+                    stop();
+                    return;
+                }
                 default       -> unknownCommand();
             }
         }
@@ -255,6 +259,7 @@ public class ServerService {
         jsonNode.put("SERVER MENU", "Options:");
         jsonNode.put("sendMessage", "Send a message to another User.");
         jsonNode.put("readMessage", "Read a chosen message.");
+        jsonNode.put("stop", "Stop server and client");
 
         sendJsonMessage(jsonNode);
     }
