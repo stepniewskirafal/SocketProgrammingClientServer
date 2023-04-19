@@ -1,4 +1,12 @@
-package pl.rstepniewski.sockets.file;
+package pl.rstepniewski.sockets.io.file;
+
+/**
+ * Created by rafal on 19.04.2023
+ *
+ * @author : rafal
+ * @date : 19.04.2023
+ * @project : SocketProgrammingClientServer
+ */
 
 public enum FilePath {
     USER_FOLDER( "src/main/resources/json/users/user"),
@@ -7,7 +15,7 @@ public enum FilePath {
     ADMIN_MESSAGE_FOLDER( "src/main/resources/json/message/admin");
     private final String folderPath;
 
-    FilePath(String folderPath) {
+    FilePath(final String folderPath) {
         this.folderPath = folderPath;
     }
 

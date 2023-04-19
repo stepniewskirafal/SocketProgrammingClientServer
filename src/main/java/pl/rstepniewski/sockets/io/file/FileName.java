@@ -1,5 +1,12 @@
-package pl.rstepniewski.sockets.file;
+package pl.rstepniewski.sockets.io.file;
 
+/**
+ * Created by rafal on 19.04.2023
+ *
+ * @author : rafal
+ * @date : 19.04.2023
+ * @project : SocketProgrammingClientServer
+ */
 public enum FileName {
     USER_FILENAME("user.json"),
     ADMIN_FILENAME("admin.json"),
@@ -7,7 +14,7 @@ public enum FileName {
 
     private final String fileName;
 
-    FileName(String fileName) {
+    FileName(final String fileName) {
         this.fileName = fileName;
     }
 

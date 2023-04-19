@@ -1,10 +1,14 @@
 package pl.rstepniewski.sockets.domain.user;
 
-import pl.rstepniewski.sockets.file.FileName;
-import pl.rstepniewski.sockets.file.FilePath;
+/**
+ * Created by rafal on 19.04.2023
+ *
+ * @author : rafal
+ * @date : 19.04.2023
+ * @project : SocketProgrammingClientServer
+ */
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

@@ -1,5 +1,13 @@
 package pl.rstepniewski.sockets.server;
 
+/**
+ * Created by rafal on 19.04.2023
+ *
+ * @author : rafal
+ * @date : 19.04.2023
+ * @project : SocketProgrammingClientServer
+ */
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -10,7 +18,7 @@ import pl.rstepniewski.sockets.domain.user.User;
 import pl.rstepniewski.sockets.domain.user.UserDto;
 import pl.rstepniewski.sockets.domain.user.UserRole;
 import pl.rstepniewski.sockets.domain.user.UserService;
-import pl.rstepniewski.sockets.file.FileService;
+import pl.rstepniewski.sockets.io.file.FileService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,23 +26,20 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class ServerService {
     private final Server server;
     private PrintWriter out;
     private BufferedReader in;
     private final Instant startTime = Instant.now();
-    private ObjectMapper objectMapper = new ObjectMapper();
-    private ObjectNode jsonNode = objectMapper.createObjectNode();
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectNode jsonNode = objectMapper.createObjectNode();
     FileService fileService = new FileService();
     UserService userService = new UserService(fileService);
     MessageService messageService = new MessageService();
 
-    ServerService(Server server) throws IOException {
+    ServerService(final Server server) throws IOException {
         this.server = server;
         start();
     }
@@ -49,7 +54,7 @@ public class ServerService {
         in = new BufferedReader(new InputStreamReader(server.getClientSocket().getInputStream()));
     }
 
-    private void stop() throws IOException {
+    private void stopServerService() throws IOException {
         in.close();
         out.close();
         server.stop();
@@ -59,17 +64,15 @@ public class ServerService {
 
         /*handleAdminInterface(new User("admin1", "admin1", UserRole.ADMIN)); --testing purposes*/
         User user = loginProcess();
-        switch (user.getRole()) {
-            case USER -> {
-                handleUserInterface(user);
-            }
-            case ADMIN -> {
-                handleAdminInterface(user);
-            }
+        UserRole role = user.getRole();
+        if(role == UserRole.USER){
+            handleUserInterface(user);
+        } else if (role == UserRole.ADMIN) {
+            handleAdminInterface(user);
         }
     }
 
-    private void handleAdminInterface(User user) throws IOException {
+    private void handleAdminInterface(final User user) throws IOException {
         showAdminInterface();
         while (true) {
             switch (getClientAnswer()) {
@@ -77,7 +80,7 @@ public class ServerService {
                 case "info"   -> showInfo();
                 case "help"   -> showHelp();
                 case "stop"   -> {
-                    stop();
+                    stopServerService();
                     return;
                 }
                 case "listAllUsers"   -> listAllUsers();
@@ -90,14 +93,14 @@ public class ServerService {
         }
     }
 
-    private void handleUserInterface(User user) throws IOException {
+    private void handleUserInterface(final User user) throws IOException {
         showUserInterface();
         while (true) {
             switch (getClientAnswer()) {
                 case "sendMessage"    -> sendMessage(user);
                 case "readMessage"    -> readMessage(user);
                 case "stop"   -> {
-                    stop();
+                    stopServerService();
                     return;
                 }
                 default       -> unknownCommand();
@@ -105,7 +108,7 @@ public class ServerService {
         }
     }
 
-    private void sendMessage(User user) throws IOException {
+    private void sendMessage(final User user) throws IOException {
         Message message = createMessage(user);
         List<Message> messageList = new ArrayList<>();
         messageList.add(message);
@@ -116,16 +119,20 @@ public class ServerService {
             return;
         }
         User userByName = userByNameOptional.get();
-        messageService.sendMessage(userByName.getRole(), userByName.getUsername(), messageList);
 
-        jsonNode.put("sendMessage", "The process of sending message successfully finished.");
+        boolean isMessageSent = messageService.sendMessage(userByName.getRole(), userByName.getUsername(), messageList);
+        if(isMessageSent){
+            jsonNode.put("sendMessage", "The process of sending message successfully finished.");
+        }else{
+            jsonNode.put("sendMessage", userByNameOptional.get().getUsername()+"'s email box is full, You can not send a message to this user.");
+        }
         sendJsonMessage(jsonNode);
     }
-    private Message createMessage(User user) throws IOException {
+    private Message createMessage(final User user) throws IOException {
         jsonNode.put("Sending a message", "Provide a recipient name and message content");
         jsonNode.put("Recipient", "Who is your text recipient?");
         sendJsonMessage(jsonNode);
-        String recipient = getClientAnswer().toLowerCase();
+        String recipient = getClientAnswer().toLowerCase(Locale.ENGLISH);
 
         jsonNode.put("Topic", "Provide a topic of your message:");
         sendJsonMessage(jsonNode);
@@ -139,7 +146,7 @@ public class ServerService {
         return new Message(topic, content, recipient, user.getUsername());
     }
 
-    private void readMessage(User user) throws IOException {
+    private void readMessage(final User user) throws IOException {
         Optional<List<Message>> messageListOptional = messageService.getUserMessages(user);
         if(messageListOptional.isEmpty()){
             jsonNode.put("emailBoxWarning", "There is no message to read.");
@@ -150,8 +157,7 @@ public class ServerService {
         jsonNode.put("emailBoxWarning", "Please, read your messages carefully as the below list will self-destruct after you pick the next option or close a connection.");
         List<Message> messageList = messageListOptional.get();
         for(int i=0; i<messageList.size(); i++) {
-            jsonNode.put("readMessage" + (i + 1), "Message from "+ messageList.get(i).getSender());
-            jsonNode.put(messageList.get(i).getSender(), messageList.get(i).getContent());
+            jsonNode.put("readMessage nr." + (i + 1) + " from "+ messageList.get(i).getSender(),  messageList.get(i).getContent());
         }
 
         sendJsonMessage(jsonNode);
@@ -187,7 +193,7 @@ public class ServerService {
         while(true) {
             jsonNode.put("Password", "Provide new user role");
             sendJsonMessage(jsonNode);
-            role = getClientAnswer().toUpperCase();
+            role = getClientAnswer().toUpperCase(Locale.ENGLISH);
             List<String> list = Arrays.stream(UserRole.values()).map(UserRole::getRoleName).toList();
             if (list.contains(role)){
                 break;
@@ -228,7 +234,7 @@ public class ServerService {
             loginAttempt = allUserList
                     .stream()
                     .filter(user -> (user.getUsername().equals(userDto.getUsername())
-                            && (user.getPassword().equals(userDto.getPassword()))))
+                            && user.getPassword().equals(userDto.getPassword())))
                     .findFirst();
             if(!loginAttempt.isEmpty()){
                 break;
@@ -280,7 +286,7 @@ public class ServerService {
         sendJsonMessage(jsonNode);
     }
 
-    private void sendJsonMessage(ObjectNode jsonNode) throws JsonProcessingException {
+    private void sendJsonMessage(final ObjectNode jsonNode) throws JsonProcessingException {
         String json = objectMapper.writeValueAsString(jsonNode);
         jsonNode.removeAll();
         out.println(json);
@@ -290,12 +296,12 @@ public class ServerService {
         Duration lifeTimeDuration = Duration.between(startTime, Instant.now());
         long seconds = lifeTimeDuration.getSeconds();
 
-        long HH = seconds / 3600;
-        long MM = (seconds % 3600) / 60;
-        long SS = seconds % 60;
-        jsonNode.put("hours", Long.toString(HH));
-        jsonNode.put("minutes", Long.toString(MM));
-        jsonNode.put("seconds", Long.toString(SS));
+        long hourCounter = seconds / 3600;
+        long minutesCounter = (seconds % 3600) / 60;
+        long secondsCounter = seconds % 60;
+        jsonNode.put("hours", Long.toString(hourCounter));
+        jsonNode.put("minutes", Long.toString(minutesCounter));
+        jsonNode.put("seconds", Long.toString(secondsCounter));
 
         sendJsonMessage(jsonNode);
     }

@@ -1,5 +1,13 @@
 package pl.rstepniewski.sockets.client;
 
+/**
+ * Created by rafal on 19.04.2023
+ *
+ * @author : rafal
+ * @date : 19.04.2023
+ * @project : SocketProgrammingClientServer
+ */
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -11,64 +19,68 @@ import java.net.Socket;
 import java.util.Map;
 import java.util.Scanner;
 
+import pl.rstepniewski.sockets.io.ConsoleUtils;
+
 public class Client {
 
     private static final String LOCAL_HOST = "localhost";
     private static final int PORT_NUMBER = 6900;
+    public static final int ONE_NODE_JSON = 1;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private Socket clientSocket;
-    private PrintWriter out;
-    private BufferedReader in;
+    private PrintWriter printWriter;
+    private BufferedReader bufferedReader;
 
     public static void main(String[] args) throws IOException {
-        Client client = new Client();
+        final Client client = new Client();
         client.startConnection(LOCAL_HOST, PORT_NUMBER);
 
         client.processCommunication();
     }
 
-    private void startConnection(String ip, int port) throws IOException {
-        clientSocket = new Socket(ip, port);
-        System.out.println("Successfully established connection with the server.");
+    private void startConnection(final String ipAddress, final int port) throws IOException {
+        clientSocket = new Socket(ipAddress, port);
+        ConsoleUtils.printLine("Successfully established connection with the server.");
     }
 
     private void stopConnection() throws IOException {
-        in.close();
-        out.close();
+        bufferedReader.close();
+        printWriter.close();
         clientSocket.close();
-        System.out.println("Successfully disconnected.");
+        ConsoleUtils.printLine("Successfully disconnected.");
     }
 
     private void processCommunication() throws IOException {
-        out = new PrintWriter(clientSocket.getOutputStream(), true);
-        in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        printWriter = new PrintWriter(clientSocket.getOutputStream(), true);
+        bufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-        Scanner scanner = new Scanner(System.in);
+        final Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            String messageFromServer = in.readLine();
+            final String messageFromServer = bufferedReader.readLine();
             if (messageFromServer != null) {
                 printMessageFromServer(messageFromServer);
-                String command = scanner.nextLine();
-                out.println(command);
+                final String command = scanner.nextLine();
+                printWriter.println(command);
             } else {
+                scanner.close();
                 stopConnection();
                 return;
             }
         }
     }
 
-    private void printMessageFromServer(String messageFromServer) throws JsonProcessingException {
-        Map<String, String> mappedMessageFromServer = objectMapper.readValue(messageFromServer, Map.class);
+    private void printMessageFromServer(final String messageFromServer) throws JsonProcessingException {
+        final Map<String, String> mappedMessageFromServer = objectMapper.readValue(messageFromServer, Map.class);
 
         String json;
-        if (mappedMessageFromServer.size() > 1) {
+        if (mappedMessageFromServer.size() > ONE_NODE_JSON) {
             json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(mappedMessageFromServer);
         } else {
             json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(mappedMessageFromServer.values());
         }
 
-        System.out.println(json);
+        ConsoleUtils.printLine(json);
     }
 
 }

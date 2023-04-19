@@ -1,5 +1,15 @@
 package pl.rstepniewski.sockets.server;
 
+/**
+ * Created by rafal on 19.04.2023
+ *
+ * @author : rafal
+ * @date : 19.04.2023
+ * @project : SocketProgrammingClientServer
+ */
+
+import pl.rstepniewski.sockets.io.ConsoleUtils;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -14,13 +24,13 @@ public class Server {
     void start() throws IOException {
         serverSocket = new ServerSocket(PORT_NUMBER);
         clientSocket = serverSocket.accept();
-        System.out.println("The client has been successfully connected.");
+        ConsoleUtils.printLine("The client has been successfully connected.");
     }
 
     void stop() throws IOException {
         clientSocket.close();
         serverSocket.close();
-        System.out.println("The client has been successfully disconnected.");
+        ConsoleUtils.printLine("The client has been successfully disconnected.");
     }
 
     String getServerVersion() {

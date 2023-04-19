@@ -24,3 +24,4 @@ readMessage,  Read the chosen message.
 #### For regular user:
 sendMessage, Send a message to another User.  
 readMessage, Read the chosen message.
+stop,   Stop server and client.  

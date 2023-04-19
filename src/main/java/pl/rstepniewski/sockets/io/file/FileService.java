@@ -1,10 +1,16 @@
-package pl.rstepniewski.sockets.file;
+package pl.rstepniewski.sockets.io.file;
+
+/**
+ * Created by rafal on 19.04.2023
+ *
+ * @author : rafal
+ * @date : 19.04.2023
+ * @project : SocketProgrammingClientServer
+ */
 
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import pl.rstepniewski.sockets.domain.message.Message;
-import pl.rstepniewski.sockets.domain.user.User;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +24,8 @@ public class FileService implements FileManager{
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public <T> List<T> importDataFromJsonFiles(String filePath, Class<T[]> type) throws IOException {
+    @Override
+    public <T> List<T> importDataFromJsonFiles(final String filePath, final Class<T[]> type) throws IOException {
         File jsonFolder = new File(filePath);
         List<File> userFiles = Files.walk(Paths.get(jsonFolder.toURI()))
                 .filter(Files::isRegularFile)
@@ -36,14 +43,14 @@ public class FileService implements FileManager{
     }
 
 
-    public <T> void exportDataToJsonFiles(List<T> messageList, FilePath filePath, String recipient, FileName fileName) throws IOException {
+    public <T> void exportDataToJsonFiles(final List<T> messageList, final FilePath filePath, final String recipient, final FileName fileName) throws IOException {
         String dataFilePath = filePath.getFolderPath()+ "/" + recipient + "/"+ fileName.getFileName();
         File jsonFile = new File(dataFilePath);
         ObjectWriter writer = objectMapper.writer(new DefaultPrettyPrinter());
         writer.writeValue(jsonFile, messageList);
     }
     @Override
-    public <T> void exportDataToJsonFiles(List<T> messageList, FilePath filePath, FileName fileName) throws IOException {
+    public <T> void exportDataToJsonFiles(final List<T> messageList, final FilePath filePath, final FileName fileName) throws IOException {
         String dataFilePath = filePath.getFolderPath()+ "/" + fileName.getFileName();
         File jsonFile = new File(dataFilePath);
         ObjectWriter writer = objectMapper.writer(new DefaultPrettyPrinter());
@@ -51,7 +58,7 @@ public class FileService implements FileManager{
     }
 
     @Override
-    public void deleteJsonMessagesFiles(FilePath filePath, String recipient) throws IOException {
+    public void deleteJsonMessagesFiles(final FilePath filePath, final String recipient) throws IOException {
         File jsonFolder = new File(filePath.getFolderPath() + "/" + recipient);
 
         List<File> userFiles = Files.walk(Paths.get(jsonFolder.toURI()))
