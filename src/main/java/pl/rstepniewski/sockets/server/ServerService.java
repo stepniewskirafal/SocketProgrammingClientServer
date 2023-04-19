@@ -239,7 +239,6 @@ public class ServerService {
             if(!loginAttempt.isEmpty()){
                 break;
             }
-            getUserNameAndPassword();
         }
         return loginAttempt.get();
     }
