@@ -120,7 +120,6 @@ class UserServiceTest {
         Assertions.assertTrue(actionResult);
     }
 
-
     @DisplayName("Add a new user")
     @ParameterizedTest(name = "Find an added user")
     @CsvSource({"user3, user3, USER"})
