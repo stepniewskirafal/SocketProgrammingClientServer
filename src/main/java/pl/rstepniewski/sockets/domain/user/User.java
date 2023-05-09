@@ -10,6 +10,8 @@ package pl.rstepniewski.sockets.domain.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 public class User {
 
     private String username;
@@ -37,5 +39,16 @@ public class User {
         return role;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(username, user.username) && Objects.equals(password, user.password) && role == user.role;
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(username, password, role);
+    }
 }

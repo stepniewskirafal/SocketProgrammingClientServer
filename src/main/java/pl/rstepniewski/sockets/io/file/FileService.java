@@ -38,10 +38,8 @@ public class FileService implements FileManager{
 
             allDataList.addAll(list);
         }
-
         return allDataList;
     }
-
 
     public <T> void exportDataToJsonFiles(final List<T> messageList, final FilePath filePath, final String recipient, final FileName fileName) throws IOException {
         String dataFilePath = filePath.getFolderPath()+ "/" + recipient + "/"+ fileName.getFileName();
@@ -49,6 +47,7 @@ public class FileService implements FileManager{
         ObjectWriter writer = objectMapper.writer(new DefaultPrettyPrinter());
         writer.writeValue(jsonFile, messageList);
     }
+
     @Override
     public <T> void exportDataToJsonFiles(final List<T> messageList, final FilePath filePath, final FileName fileName) throws IOException {
         String dataFilePath = filePath.getFolderPath()+ "/" + fileName.getFileName();

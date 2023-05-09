@@ -61,16 +61,16 @@ public class MessageService {
             if(file.exists()) {
                 userMessageBox = Optional.of(fileService.importDataFromJsonFiles( filePath, Message[].class));
                 if(userMessageBox.isEmpty()){
-                    fileService.exportDataToJsonFiles(messageList, FilePath.USER_MESSAGE_FOLDER, recipient  ,FileName.MESSAGE_FILENAME);
+                    fileService.exportDataToJsonFiles(messageList, FilePath.USER_MESSAGE_FOLDER, recipient, FileName.MESSAGE_FILENAME);
                 } else if (userMessageBox.get().size() < MessageConst.MAX_NUMBER_OF_MESSAGES.getMessageLenght()) {
                     allMessagesToSave = userMessageBox.get();
                     allMessagesToSave.addAll(messageList);
-                    fileService.exportDataToJsonFiles(allMessagesToSave, FilePath.USER_MESSAGE_FOLDER, recipient  ,FileName.MESSAGE_FILENAME);
+                    fileService.exportDataToJsonFiles(allMessagesToSave, FilePath.USER_MESSAGE_FOLDER, recipient, FileName.MESSAGE_FILENAME);
                 }else {
                     isMessageSent = false;
                 }
             }else {
-                fileService.exportDataToJsonFiles(messageList, FilePath.USER_MESSAGE_FOLDER, recipient  ,FileName.MESSAGE_FILENAME);
+                fileService.exportDataToJsonFiles(messageList, FilePath.USER_MESSAGE_FOLDER, recipient, FileName.MESSAGE_FILENAME);
             }
         } else if (role == UserRole.ADMIN) {
             filePath = FilePath.ADMIN_MESSAGE_FOLDER.getFolderPath() + "/" + recipient + "/" + FileName.MESSAGE_FILENAME.getFileName();
@@ -79,9 +79,9 @@ public class MessageService {
                 userMessageBox = Optional.of(fileService.importDataFromJsonFiles( filePath, Message[].class) );
                 allMessagesToSave = userMessageBox.get();
                 allMessagesToSave.addAll(messageList);
-                fileService.exportDataToJsonFiles(allMessagesToSave, FilePath.ADMIN_MESSAGE_FOLDER, recipient  ,FileName.MESSAGE_FILENAME);
+                fileService.exportDataToJsonFiles(allMessagesToSave, FilePath.ADMIN_MESSAGE_FOLDER, recipient, FileName.MESSAGE_FILENAME);
             }else {
-                fileService.exportDataToJsonFiles(messageList, FilePath.ADMIN_MESSAGE_FOLDER, recipient  ,FileName.MESSAGE_FILENAME);
+                fileService.exportDataToJsonFiles(messageList, FilePath.ADMIN_MESSAGE_FOLDER, recipient, FileName.MESSAGE_FILENAME);
             }
         }
 
