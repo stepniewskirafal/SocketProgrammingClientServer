@@ -114,7 +114,7 @@ class UserServiceTest {
 
     @DisplayName("Add a new user")
     @ParameterizedTest(name = "Procedure returned true")
-    @CsvSource({"user1, user1, USER"})
+    @CsvSource({"userTest, userTest, USER"})
     void isAddNewUserTrue(String newUserName, String newUserPassword, UserRole newUserRole) throws IOException {
         boolean actionResult = userService.addNewUser(new User(newUserName, newUserPassword, newUserRole));
         Assertions.assertTrue(actionResult);
