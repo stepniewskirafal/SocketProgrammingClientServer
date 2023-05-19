@@ -1,27 +1,29 @@
-# SocketProgramming
-### Description
-This program is a simple client/server application based on data (JSON format) transfer with sockets.
+# Socket Programming
 
-### User management
-The application allows you to create a user and log in. The user can also send or check received messages and clear his inbox. In addition, the admin can delete users or grant them privileges.
+## Description
+Socket Programming is a client/server application that enables data transfer using sockets. The program is designed to facilitate user management and message handling.
 
-### Message management
-The application allows you to send (and read) private messages (up to 255 characters) between users. The unread messages box for users can store up to 5 messages (the admin inbox has unlimited capacity). When the limit is reached, the sender receives information about its overflow.
+## User Management
+The application provides functionalities for user creation and login. Users can send and check received messages, as well as clear their inbox. Additionally, administrators have the privilege to delete users or grant them special privileges.
 
-### Commands
-#### For admin:
-uptime, Return server running time.  
-info,   Return server version and creation date.  
-help,   Return list of available commands.  
-stop,   Stop server and client.  
+## Message Management
+The application allows users to send private messages to other users, with a maximum limit of 255 characters per message. Users have an unread messages box that can store up to 5 messages, while the admin inbox has unlimited capacity. When the inbox is full, the sender is notified of the overflow.
 
-listAllUsers, Show a list of all users and their roles.  
-addNewUser,   Add a new user to the app.  
-deleteUser,   Delete user from the app.  
-sendMessage,  Send a message to another User.  
-readMessage,  Read the chosen message.  
+## Commands
 
-#### For regular user:
-sendMessage, Send a message to another User.  
-readMessage, Read the chosen message.
-stop,   Stop server and client.  
+### For Admin:
+- `uptime`: Returns the server's running time.
+- `info`: Returns the server version and creation date.
+- `help`: Displays a list of available commands.
+- `stop`: Stops the server and client.
+
+- `listAllUsers`: Shows a list of all users and their roles.
+- `addNewUser`: Adds a new user to the application.
+- `deleteUser`: Deletes a user from the application.
+- `sendMessage`: Sends a message to another user.
+- `readMessage`: Reads the chosen message.
+
+### For Regular User:
+- `sendMessage`: Sends a message to another user.
+- `readMessage`: Reads the chosen message.
+- `stop`: Stops the server and client.
