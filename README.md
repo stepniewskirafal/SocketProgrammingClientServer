@@ -9,6 +9,9 @@ The application provides functionalities for user creation and login. Users can 
 ## Message Management
 The application allows users to send private messages to other users, with a maximum limit of 255 characters per message. Users have an unread messages box that can store up to 5 messages, while the admin inbox has unlimited capacity. When the inbox is full, the sender is notified of the overflow.
 
+## JSON File Format
+The application uses JSON file format to store user and message information. This format allows for easy parsing and manipulation of data.
+
 ## Commands
 
 ### For Admin:
